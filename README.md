@@ -1,4 +1,4 @@
-﻿# MapMarkers
+# MapMarkers
 [Slime Rancher](http://slimerancher.com/) mod for [SRML](https://www.nexusmods.com/slimerancher/mods/2) that adds custom markers to the in-game map.
 
 ## Implemented Features
