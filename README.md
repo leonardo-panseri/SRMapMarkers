@@ -13,8 +13,9 @@
 
 ## Install
 1. Install SRML
-2. Download the latest *MapMarkers.dll* from [NexusMods]()
-3. Move *MapMarkers.dll* to `<slime rancher game folder>/SRML/Mods`
+2. Download the latest *MapMarkers.zip* from [NexusMods](https://www.nexusmods.com/slimerancher/mods/279)
+3. Extract *MapMarkers.dll* from the archive
+4. Move *MapMarkers.dll* to `<slime rancher game folder>/SRML/Mods`
 
 ## Build
 1. Clone the repo
