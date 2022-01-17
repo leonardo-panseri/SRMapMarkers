@@ -21,19 +21,19 @@ namespace MapMarkers
         /// <summary>
         /// Flag indicating if all treasure pods should be shown on the map.
         /// </summary>
-        public static bool showAll;
+        public static bool showAll = false;
         /// <summary>
         /// Flag indicating if already opened treasure pods should be shown on the map (the sprites will be transparent to distinguish them).
         /// </summary>
-        public static bool showOpened;
+        public static bool showOpened = true;
 
         /// <summary>
         /// List containing <c>GameObject</c> position of all discovered treasure pods.
         /// </summary>
-        private static List<Vector3> discoveredTreasurePods;
+        private static List<Vector3> discoveredTreasurePods = new List<Vector3>();
 
         /// <summary>
-        /// Dictionary mapping an int that represents the type of treasure pods to the texture used for the sprite to be displayed on the map.
+        /// Dictionary mapping an int that represents the type of treasure pods to the sprite to be displayed on the map.
         /// Valid types are:
         /// <list type="bullet">
         /// <item><term>1</term><description> green treasure pod</description></item>
@@ -42,7 +42,8 @@ namespace MapMarkers
         /// <item><term>4</term><description> cosmetic treasure pod (DLC)</description></item>
         /// </list>
         /// </summary>
-        private static readonly Dictionary<int, Texture2D> podTextures = new Dictionary<int, Texture2D>();
+        private static readonly Dictionary<int, Sprite> podSprites = new Dictionary<int, Sprite>();
+        public static readonly Dictionary<int, Sprite> openPodSprites = new Dictionary<int, Sprite>();
 
         /// <summary>
         /// Flag used to prevent calling every frame methods to check the treasure pod that the player is looking at.
@@ -69,19 +70,16 @@ namespace MapMarkers
                 {
                     showAll = compoundDataPiece.GetValue<bool>("showAllTreasuresOnMap");
                 }
-                else showAll = false;
                 if (compoundDataPiece.HasPiece("showOpenedTreasuresOnMap"))
                 {
                     showOpened = compoundDataPiece.GetValue<bool>("showOpenedTreasuresOnMap");
                 }
-                else showOpened = true;
 
                 // If the custom world data has discovered treasure pods locations saved, load them
                 if (compoundDataPiece.HasPiece("discoveredTreasurePods"))
                 {
                     discoveredTreasurePods = new List<Vector3>(compoundDataPiece.GetValue<Vector3[]>("discoveredTreasurePods"));
                 }
-                else discoveredTreasurePods = new List<Vector3>();
             });
 
             // Attach event handler to SRML custom world data save
@@ -98,11 +96,15 @@ namespace MapMarkers
             SRCallbacks.OnSaveGameLoaded += (scenecontext) =>
             {
                 // Load mod asset bundle
-                AssetBundle assetBundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(MapMarkers), "Resources.mapmarkers.assetsBundle"));
+                AssetBundle assetBundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(MapMarkers), "Resources.mapmarkers.assets"));
                 for (int i = 1; i < 5; i++)
                 {
-                    // Load treasure pod sprite texture from asset bundle
-                    podTextures[i] = assetBundle.LoadAsset<Texture2D>("treasurepod" + i + ".png");
+                    // Load treasure pod textures from asset bundle and create sprites
+                    Texture2D podTexture = assetBundle.LoadAsset<Texture2D>("treasurepod" + i + ".png");
+                    podSprites[i] = Sprite.Create(podTexture, new Rect(0, 0, 512, 512), new Vector2(0, 0));
+
+                    Texture2D openPodTexture = assetBundle.LoadAsset<Texture2D>("treasurepod" + i + "_open.png");
+                    openPodSprites[i] = Sprite.Create(openPodTexture, new Rect(0, 0, 512, 512), new Vector2(0, 0));
                 }
 
                 // Create treasure pod map marker prefabs for every type of treasure pod
@@ -174,7 +176,7 @@ namespace MapMarkers
             clone.name = "TreasurePod" + type + "Marker";
 
             // Assing the correct sprite for the given treasure pod type
-            clone.GetComponent<Image>().sprite = Sprite.Create(podTextures[type], new Rect(0, 0, 32, 32), new Vector2(0, 0));
+            clone.GetComponent<Image>().sprite = podSprites[type];
             return clone;
         }
 
@@ -321,8 +323,9 @@ namespace MapMarkers
             opened = true;
             Image markerImg = base.GetMarker().gameObject.GetComponent<Image>();
             Color temp = markerImg.color;
-            temp.a = 0.5f;
+            temp.a = 0.7f;
             markerImg.color = temp;
+            markerImg.sprite = MapMarkers.openPodSprites[MapMarkers.GetTreasurePodType(base.gameObject)];
         }
     }
 

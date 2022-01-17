@@ -27,5 +27,8 @@
     - *UnityEngine.AssetBundleModule.dll* - found in `<slime rancher game folder>/SlimeRancher_Data/Managed`
     - *UnityEngine.PhysicsModule.dll* - found in `<slime rancher game folder>/SlimeRancher_Data/Managed`
     - *UnityEngine.UI.dll* - found in `<slime rancher game folder>/SlimeRancher_Data/Managed`
-3. Make sure that the resource *mapmarkers.assetsBundle* is correctly configured and its *Build Action* is set to *Embedded Resource*
+3. Make sure that the resource *mapmarkers.assets* is correctly configured and its *Build Action* is set to *Embedded Resource*
 4. Build the solution, the output *MapMarkers.dll* is located at `<project folder>/bin/Debug/MapMarkers.dll`
+
+## Credits
+Thanks to DracoClaw for treasure pod marker textures

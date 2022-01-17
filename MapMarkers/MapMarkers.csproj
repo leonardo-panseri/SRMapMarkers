@@ -81,7 +81,7 @@
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>
-    <EmbeddedResource Include="Resources\mapmarkers.assetsBundle" />
+    <EmbeddedResource Include="Resources\mapmarkers.assets" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
