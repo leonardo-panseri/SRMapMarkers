@@ -33,6 +33,11 @@ namespace MapMarkers
         private static List<Vector3> discoveredTreasurePods = new List<Vector3>();
 
         /// <summary>
+        /// The asset bundle containing assets needed by the mod.
+        /// </summary>
+        private static AssetBundle assetBundle;
+
+        /// <summary>
         /// Dictionary mapping an int that represents the type of treasure pods to the sprite to be displayed on the map.
         /// Valid types are:
         /// <list type="bullet">
@@ -62,6 +67,9 @@ namespace MapMarkers
             Console.RegisterCommand(new ShowAllCommand());
             Console.RegisterCommand(new ShowOpenedCommand());
             Console.RegisterCommand(new ResetDiscoveredCommand());
+
+            // Load mod asset bundle
+            assetBundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(MapMarkers), "Resources.mapmarkers.assets"));
 
             // Attach event handler to SRML custom world data load
             SaveRegistry.RegisterWorldDataLoadDelegate((compoundDataPiece) => {
@@ -95,8 +103,6 @@ namespace MapMarkers
             // Attach event handler to save game loaded
             SRCallbacks.OnSaveGameLoaded += (scenecontext) =>
             {
-                // Load mod asset bundle
-                AssetBundle assetBundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(MapMarkers), "Resources.mapmarkers.assets"));
                 for (int i = 1; i < 5; i++)
                 {
                     // Load treasure pod textures from asset bundle and create sprites
