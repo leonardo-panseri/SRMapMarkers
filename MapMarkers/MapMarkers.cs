@@ -26,6 +26,10 @@ namespace MapMarkers
         /// Flag indicating if already opened treasure pods should be shown on the map (the sprites will be transparent to distinguish them).
         /// </summary>
         public static bool showOpened = true;
+        /// <summary>
+        /// Flag indicating if all Gordos should be shown on the map.
+        /// </summary>
+        public static bool showGordos = false;
 
         /// <summary>
         /// List containing <c>GameObject</c> position of all discovered treasure pods.
@@ -67,6 +71,7 @@ namespace MapMarkers
             Console.RegisterCommand(new ShowAllCommand());
             Console.RegisterCommand(new ShowOpenedCommand());
             Console.RegisterCommand(new ResetDiscoveredCommand());
+            Console.RegisterCommand(new ShowAllGordosCommand());
 
             // Load mod asset bundle
             assetBundle = AssetBundle.LoadFromStream(Assembly.GetExecutingAssembly().GetManifestResourceStream(typeof(MapMarkers), "Resources.mapmarkers.assets"));
@@ -78,11 +83,19 @@ namespace MapMarkers
                 {
                     showAll = compoundDataPiece.GetValue<bool>("showAllTreasuresOnMap");
                 }
+                else showAll = false;
                 if (compoundDataPiece.HasPiece("showOpenedTreasuresOnMap"))
                 {
                     showOpened = compoundDataPiece.GetValue<bool>("showOpenedTreasuresOnMap");
                 }
+                else showOpened = true;
+                if (compoundDataPiece.HasPiece("showAllGordosOnMap"))
+                {
+                    showGordos = compoundDataPiece.GetValue<bool>("showAllGordosOnMap");
+                }
+                else showGordos = false;
 
+                discoveredTreasurePods.Clear();
                 // If the custom world data has discovered treasure pods locations saved, load them
                 if (compoundDataPiece.HasPiece("discoveredTreasurePods"))
                 {
@@ -95,6 +108,7 @@ namespace MapMarkers
                 // Save the current status of flags
                 compoundDataPiece.SetValue("showAllTreasuresOnMap", showAll);
                 compoundDataPiece.SetValue("showOpenedTreasuresOnMap", showOpened);
+                compoundDataPiece.SetValue("showAllGordosOnMap", showGordos);
 
                 // Save the discovered treasure pods locations
                 compoundDataPiece.SetValue("discoveredTreasurePods", discoveredTreasurePods.ToArray());
@@ -363,6 +377,20 @@ namespace MapMarkers
         }
     }
 
+    [HarmonyPatch(typeof(GordoDisplayOnMap))]
+    [HarmonyPatch("ShowOnMap")]
+    class Patch02
+    {
+        static void Postfix(GordoDisplayOnMap __instance, ref bool __result)
+        {
+            if(MapMarkers.showGordos)
+            {
+                CellDirector parentCellDirector = Traverse.Create(__instance).Method("GetParentCellDirector").GetValue<CellDirector>();
+                __result = (!(parentCellDirector != null) || !parentCellDirector.notShownOnMap);
+            }
+        }
+    }
+
     class ShowAllCommand : ConsoleCommand
     {
         public override string ID => "showalltreasures";
@@ -418,6 +446,26 @@ namespace MapMarkers
             MapMarkers.ForceRefreshMap();
 
             Console.Log("[MapMarkers]: Reset successful!");
+            return true;
+        }
+    }
+
+    class ShowAllGordosCommand : ConsoleCommand
+    {
+        public override string ID => "showallgordos";
+
+        public override string Usage => "showallgordos";
+
+        public override string Description => "Toggles if all gordos should be shown on the map";
+
+        public override bool Execute(string[] args)
+        {
+            MapMarkers.showGordos = !MapMarkers.showGordos;
+
+            MapMarkers.ForceRefreshMap();
+
+            if (MapMarkers.showGordos) Console.Log("[MapMarkers]: Now showing all gordos on the map!");
+            else Console.Log("[MapMarkers]: No longer showing all gordos on the map!");
             return true;
         }
     }

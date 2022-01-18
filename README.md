@@ -7,6 +7,7 @@
     - *showalltreasures*: toggles if all treasure pods should be shown on the map (default: false)
     - *showopenedtreasures*: toggles if already opened treasure pods should be shown on the map (default: true)
     - *resetdiscoveredtreasures*: resets all locked treasure pods to undiscovered (no longer shows them on map)
+    - *showallgordos*: toggles if all gordos should be shown on the map (default: false)
 
 ## Planned Features
 - Custom markers that can be added by clicking on the map
